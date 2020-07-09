@@ -19,7 +19,7 @@ func main() {
 		log.Println(resp.Status)
 	}
 
-	c := &chief.Chief{
+	c := &chief.Master{
 		NumWorkers: 2,
 		Handler:    handler,
 	}

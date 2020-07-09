@@ -37,8 +37,8 @@ type (
 		dropTasks bool
 	}
 
-	// Chief manages all the incoming tasks.
-	Chief struct {
+	// Master manages all the incoming tasks.
+	Master struct {
 		NumWorkers int
 		Handler    HandlerFunc
 		// If true Chief will not wait for tasks to be executed by a worker.
@@ -59,7 +59,7 @@ type (
 	}
 )
 
-func (c *Chief) stopping(openTasks int) {
+func (c *Master) stopping(openTasks int) {
 	if c.OnStopDropTasks {
 		close(c.stopTasks)
 	} else {
@@ -85,7 +85,7 @@ func (c *Chief) stopping(openTasks int) {
 	close(c.allWorkerStopped)
 }
 
-func (c *Chief) loop() {
+func (c *Master) loop() {
 	openTasks := 0
 	for {
 		select {
@@ -110,7 +110,7 @@ func (c *Chief) loop() {
 }
 
 // Start starts master chief and makes him ready to receive tasks.
-func (c *Chief) Start() error {
+func (c *Master) Start() error {
 	c.lock.Lock()
 
 	if c.isStopped {
@@ -161,7 +161,7 @@ func (c *Chief) Start() error {
 }
 
 // Stop stops master chief. The method blocks until all workers are done with the current task. No new task can be queued.
-func (c *Chief) Stop() error {
+func (c *Master) Stop() error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -184,7 +184,7 @@ func (c *Chief) Stop() error {
 }
 
 // Queue queues a new task
-func (c *Chief) Queue(task Task) {
+func (c *Master) Queue(task Task) {
 	c.tasks <- task
 }
 

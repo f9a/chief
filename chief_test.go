@@ -11,7 +11,7 @@ func Test_StartSendJobStopChief(t *testing.T) {
 		done <- t
 	}
 
-	c := &Chief{
+	c := &Master{
 		NumWorkers: 1,
 		Handler:    fn,
 	}
@@ -45,7 +45,7 @@ func Test_StopAndDontWaitForAllTaskToFinish(t *testing.T) {
 		done <- t
 	}
 
-	c := &Chief{
+	c := &Master{
 		NumWorkers:      1,
 		Handler:         fn,
 		OnStopDropTasks: true,
@@ -73,7 +73,7 @@ func Test_StopAndWaitForAllTaskToFinish(t *testing.T) {
 		done <- t
 	}
 
-	c := &Chief{
+	c := &Master{
 		NumWorkers: 1,
 		Handler:    fn,
 	}
@@ -99,13 +99,13 @@ func Test_StartStopChief(t *testing.T) {
 	fn := func(_ Task) {
 	}
 
-	c := &Chief{}
+	c := &Master{}
 	err := c.Start()
 	if err.Error() != "Handler is missing" {
 		t.Fatalf("Want 'Handler is missing' error, got %v", err)
 	}
 
-	c = &Chief{
+	c = &Master{
 		Handler: fn,
 	}
 	err = c.Start()
@@ -113,7 +113,7 @@ func Test_StartStopChief(t *testing.T) {
 		t.Fatalf("Want 'NumWorks must be greater then 0' error, got %v", err)
 	}
 
-	c = &Chief{
+	c = &Master{
 		NumWorkers: 1,
 		Handler:    fn,
 	}
@@ -155,7 +155,7 @@ func Test_StartManyWorkersSendJobsStopChief(t *testing.T) {
 		done <- struct{}{}
 	}
 
-	c := &Chief{
+	c := &Master{
 		NumWorkers: 10,
 		Handler:    fn,
 	}

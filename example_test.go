@@ -17,7 +17,7 @@ func ExampleCheckWebPages() {
 		log.Println(resp.Status)
 	}
 
-	c := &Chief{
+	c := &Master{
 		NumWorkers: 2,
 		Handler:    handler,
 	}
