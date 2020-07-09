@@ -32,21 +32,67 @@ func Test_StartSendJobStopChief(t *testing.T) {
 		t.Fatalf("Want 2, got %v", r)
 	}
 
-	go func() {
+	err = c.Stop()
+	if err != nil {
+		t.Fatalf("Stop shouldn't return an error: %v", err)
+	}
+}
+
+func Test_StopAndDontWaitForAllTaskToFinish(t *testing.T) {
+	done := make(chan Task, 1)
+	fn := func(t Task) {
+		time.Sleep(2 * time.Second)
+		done <- t
+	}
+
+	c := &Chief{
+		NumWorkers:      1,
+		Handler:         fn,
+		OnStopDropTasks: true,
+	}
+	err := c.Start()
+	if err != nil {
+		t.Fatalf("Start shouldn't return an error: %v", err)
+	}
+
+	c.Queue(1)
+	<-done
+
+	c.Queue(2)
+
+	err = c.Stop()
+	if err != nil {
+		t.Fatalf("Stop shouldn't return an error: %v", err)
+	}
+}
+
+func Test_StopAndWaitForAllTaskToFinish(t *testing.T) {
+	done := make(chan Task, 1)
+	fn := func(t Task) {
 		time.Sleep(1 * time.Second)
-		c.Queue(nil)
-	}()
+		done <- t
+	}
+
+	c := &Chief{
+		NumWorkers: 1,
+		Handler:    fn,
+	}
+	err := c.Start()
+	if err != nil {
+		t.Fatalf("Start shouldn't return an error: %v", err)
+	}
+
+	c.Queue(1)
+	<-done
+
+	c.Queue(2)
 
 	err = c.Stop()
 	if err != nil {
 		t.Fatalf("Stop shouldn't return an error: %v", err)
 	}
 
-	select {
-	case <-done:
-		t.Fatalf("Shouldn't receive done signal")
-	case <-time.After(2 * time.Second):
-	}
+	<-done
 }
 
 func Test_StartStopChief(t *testing.T) {
