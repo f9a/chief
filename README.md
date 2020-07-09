@@ -8,7 +8,7 @@ Master Chief handles task with a worker pool. Chief is ready to handle 100k of t
 package main
 
 func main() {
-	handler := func(j Task) {
+	handler := func(j chief.Task) {
 		url := j.(string)
 		resp, err := http.Get(url)
 
@@ -19,7 +19,7 @@ func main() {
 		log.Println(resp.Status)
 	}
 
-	c := &Chief{
+	c := &chief.Chief{
 		NumWorkers: 2,
 		Handler:    handler,
 	}
